@@ -21,6 +21,9 @@
     <script src="//unpkg.com/alpinejs" defer></script>
 
     <link rel="stylesheet" href="{{asset('dependences/css/dataTables.tailwindcss.css')}}">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    
     <!-- Configurações vite   -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -36,21 +39,52 @@
             'icon' => 'fas fa-home',
             'route' => route('dashboard'),
             'active' => 'dashboard'
-        ],
-        [
+        ],[
+            'label' => 'CRM',
+            'icon' => 'fas fa-user-friends',
+            'key' => 'crm',
+            'active' => 'crm',
+            'submenu' => [
+                [
+                    'label' => 'Pedidos',
+                    'key' => 'orders',
+                    'icon' => 'fas fa-receipt',
+                    'submenu' => [
+                        [
+                            'label' => 'Demonstrativo',
+                            'route' => '',
+                            'active' => 'orders'
+                        ]
+                    ],
+                ],[
+                    'label' => 'Orçamentos',
+                    'key' => 'budgets',
+                    'icon' => 'fas fa-file-invoice-dollar',
+                    'submenu' => [
+                        [
+                            'label' => 'Demonstrativo',
+                            'route' => '',
+                            'active' => 'budgets'
+                        ]
+                    ],
+                ]
+
+            ]
+        ],[
             'label' => 'Configurações',
             'icon' => 'fas fa-cog',
-            'key' => 'sales',
-            'active' => 'sales',
+            'key' => 'settings',
+            'active' => 'settings',
             'submenu' => [
                 [
                     'label' => 'Comercial',
-                    'key' => 'orders',
+                    'key' => 'commercial',
+                    'icon' => 'fas fa-handshake',
                     'submenu' => [
                         [
                             'label' => 'Marketplaces',
                             'route' => route('marketplaces.index'),
-                            'active' => 'orders'
+                            'active' => 'commercial'
                         ]
                     ]
                 ],
@@ -76,6 +110,8 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
 <script src="{{ asset('js/globals/sidebar.js') }}" type="text/javascript"></script>
 <script src="{{ asset('js/globals/utils.js') }}" type="text/javascript"></script>

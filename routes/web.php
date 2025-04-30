@@ -5,6 +5,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Settings\Commercial\MarketplaceController;
 use Illuminate\Support\Facades\Route;
 
+Route::redirect('/', '/panel/dashboard');
+
 Route::controller(HomeController::class)->group(function (){
 
     Route::get('/panel/dashboard', 'index')->name('dashboard');
