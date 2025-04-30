@@ -1,54 +1,67 @@
 @props([
-    'name' => '',
-    'label' => '',
+    'id' => 'canal',
+    'name' => 'canal',
+    'label' => 'Canal',
+    'icon' => 'fas fa-store',
     'options' => [],
-    'selected' => '',
-    'placeholder' => 'Selecione uma opção',
-    'required' => false,
-    'disabled' => false,
-    'error' => '',
-    'helpText' => '',
-    'wrapperClass' => '',
-    'selectClass' => '',
-    'labelClass' => '',
+    'selected' => null,
+    'placeholder' => 'Selecione um canal',
+    'disabledPlaceholder' => true,
+    'containerClass' => 'space-y-2',
+    'labelClass' => 'block text-sm font-medium text-gray-700 flex items-center',
+    'iconClass' => 'mr-2 text-gray-500',
+    'selectContainerClass' => 'relative',
+    'selectClass' => 'appearance-none w-full pl-3 pr-10 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer',
+    'arrowClass' => 'pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700',
+    'arrowIcon' => 'fas fa-chevron-down',
+    'optionValue' => 'id', // Key for option value
+    'optionLabel' => 'name', // Key for option label
 ])
 
-<div class="{{ $wrapperClass }} space-y-1">
+<div class="{{ $containerClass }}">
     @if($label)
-        <label for="{{ $name }}" class="block text-sm font-medium text-gray-700 {{ $labelClass }}">
-            {{ $label }}
-            @if($required)
-                <span class="text-red-500">*</span>
+        <label for="{{ $id }}" class="{{ $labelClass }}">
+            @if($icon)
+                <i class="{{ $icon }} {{ $iconClass }}"></i>
             @endif
+            {{ $label }}
         </label>
     @endif
 
-    <select
-        name="{{ $name }}"
-        id="{{ $name }}"
-        {{ $required ? 'required' : '' }}
-        {{ $disabled ? 'disabled' : '' }}
-        @class([
-            'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
-            'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' => $error,
-            'bg-gray-100 text-gray-500' => $disabled,
-            $selectClass
-        ])
-        {{ $attributes }}
-    >
-        <option value="">{{ $placeholder }}</option>
-        @foreach($options as $value => $text)
-            <option value="{{ $value }}" {{ $selected == $value ? 'selected' : '' }}>
-                {{ $text }}
-            </option>
-        @endforeach
-    </select>
+    <div class="{{ $selectContainerClass }}">
+        <select
+            id="{{ $id }}"
+            name="{{ $name }}"
+            class="{{ $selectClass }}"
+            {{ $attributes }}
+        >
+            @if($placeholder)
+                <option value="" @if($disabledPlaceholder) disabled @endif @if(is_null($selected)) selected @endif>
+                    {{ $placeholder }}
+                </option>
+            @endif
 
-    @if($error)
-        <p class="mt-1 text-sm text-red-600">{{ $error }}</p>
-    @endif
+            @foreach($options as $option)
+                @if(is_object($option))
+                    <option
+                        value="{{ $option->{$optionValue} }}"
+                        @if(!is_null($selected) && $option->{$optionValue} == $selected) selected @endif
+                    >
+                        {{ $option->{$optionLabel} }}
+                    </option>
+                @else
+                    <option
+                        value="{{ $option[$optionValue] }}"
+                        @if(!is_null($selected) && $option[$optionValue] == $selected) selected @endif
+                    >
+                        {{ $option[$optionLabel] }}
+                    </option>
+                @endif
+            @endforeach
+        </select>
 
-    @if($helpText)
-        <p class="mt-1 text-sm text-gray-500">{{ $helpText }}</p>
-    @endif
+        <div class="{{ $arrowClass }}">
+            <i class="{{ $arrowIcon }}"></i>
+        </div>
+    </div>
 </div>
