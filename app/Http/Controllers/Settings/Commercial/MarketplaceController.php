@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings\Commercial;
 
 use App\DTOs\Settings\Commercial\Marketplaces\RuleDto;
+use App\Exception\RuleSaveException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\Commercial\Marketplaces\StoreNewRuleRequest;
 use App\Services\Settings\Commercial\ChannelsServices;
@@ -30,7 +31,7 @@ class MarketplaceController extends Controller
                 'channel' => $channel,
             ]);
 
-        } catch (\RuntimeException $e) {
+        } catch (\RuleSaveException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
