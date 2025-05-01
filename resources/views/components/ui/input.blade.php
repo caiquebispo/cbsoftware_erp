@@ -59,7 +59,7 @@
         @endif
 
         @php
-            $inputPadding = '';
+            $inputPadding = 'px-2';
             if ($prefix) $inputPadding .= ' pl-7';
             if ($prefix) $inputPadding .= ' pr-3';
             if ($suffix) $inputPadding .= ' pr-7';
