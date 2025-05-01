@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\CRM\Budgets\DemonstrativeController as DemonstrativeBudgetsController;
 use App\Http\Controllers\CRM\Orders\DemonstrativeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Settings\Commercial\MarketplaceController;
@@ -23,4 +24,9 @@ Route::controller(MarketplaceController::class)->group(function (){
 Route::controller(DemonstrativeController::class)->group(function (){
 
     Route::get('/panel/crm/orders/demonstrative', 'index')->name('demonstrative.index');
+});
+
+Route::controller(DemonstrativeBudgetsController::class)->group(function (){
+
+    Route::get('/panel/crm/budgets/demonstrative', 'index')->name('demonstrative-budget.index');
 });
