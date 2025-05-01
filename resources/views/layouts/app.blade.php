@@ -52,7 +52,7 @@
                     'submenu' => [
                         [
                             'label' => 'Demonstrativo',
-                            'route' => '',
+                            'route' => route('demonstrative.index'),
                             'active' => 'orders'
                         ]
                     ],
@@ -120,7 +120,8 @@
 
 {{--Modal--}}
 <x-ui.modal />
-
+{{--loading--}}
+<x-ui.loading />
 @yield('scripts')
 <script>
     $(document).ready(function() {
