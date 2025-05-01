@@ -9,7 +9,7 @@
     <title> Guimepa - @yield('title')</title>
 
     <!-- Tailwind CSS -->
-    <script src="{{asset('dependences/js/tailwind-3.4.16.js')}}"></script>
+    <script src="{{asset('dependencies/js/tailwind-3.4.16.js')}}"></script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -20,10 +20,10 @@
     <!-- Alpine JS -->
     <script src="//unpkg.com/alpinejs" defer></script>
 
-    <link rel="stylesheet" href="{{asset('dependences/css/dataTables.tailwindcss.css')}}">
+    <link rel="stylesheet" href="{{asset('dependencies/css/dataTables.tailwindcss.css')}}">
 
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    
+
     <!-- Configurações vite   -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -115,8 +115,8 @@
 
 <script src="{{ asset('js/globals/sidebar.js') }}" type="text/javascript"></script>
 <script src="{{ asset('js/globals/utils.js') }}" type="text/javascript"></script>
-<script src="{{ asset('dependences/js/jquery.dataTables.js') }}" type="text/javascript"></script>
-<script src="{{ asset('dependences/js/dataTables.tailwindcss.js') }}" type="text/javascript"></script>
+<script src="{{ asset('dependencies/js/jquery.dataTables.js') }}" type="text/javascript"></script>
+<script src="{{ asset('dependencies/js/dataTables.tailwindcss.js') }}" type="text/javascript"></script>
 
 {{--Modal--}}
 <x-ui.modal />
