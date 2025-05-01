@@ -3,11 +3,11 @@
 @section('title', 'Demonstrativo Margem de IPV')
 
 @section('content')
-    <x-ui.section>
-        <x-ui.section-header
-            title="Filtros"
-            icon="fa-solid fa-filter"
-        />
+    <x-ui.section collapsed="true">
+        <x-slot:header>
+            <x-ui.section-header title="Filtros" icon="fa-solid fa-filter" />
+        </x-slot:header>
+
         <div class="flex flex-col md:flex-row gap-5">
             <x-ui.input type="text" name="orders_id" placeholder="315879" icon="fa-solid fa-magnifying-glass" label="Pedido" class="w-full px-2" />
             <x-ui.input type="text" name="periods" icon="fa-solid fa-calendar-days" label="Data de Emissão" class="w-full" />
@@ -17,11 +17,11 @@
         </div>
     </x-ui.section>
 
-    <x-ui.section class="my-6">
-        <x-ui.section-header
-            title="Indicadores de Performance"
-            icon="fa-solid fa-chart-line"
-        />
+    <x-ui.section collapsed="true" class="my-6">
+        <x-slot:header>
+            <x-ui.section-header title="Indicadores de Performance" icon="fa-solid fa-chart-line" />
+        </x-slot:header>
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-4">
             <x-ui.performance-indicators
                 title="Receita Total"
@@ -67,18 +67,16 @@
         </div>
     </x-ui.section>
 
-    <x-ui.section>
-        <x-ui.section-header
-            title="Gráfico"
-            icon="fa-solid fa-chart-bar"
-        />
+    <x-ui.section collapsed="true">
+        <x-slot:header>
+            <x-ui.section-header title="Gráfico" icon="fa-solid fa-chart-bar" />
+        </x-slot:header>
     </x-ui.section>
 
-    <x-ui.section class="my-6">
-        <x-ui.section-header
-            title="Tabela"
-            icon="fa-solid fa-table"
-        />
+    <x-ui.section class="my-6" collapsed="true">
+        <x-slot:header>
+            <x-ui.section-header title="Tabela" icon="fa-solid fa-table" />
+        </x-slot:header>
     </x-ui.section>
 @endsection
 
