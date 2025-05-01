@@ -26,26 +26,26 @@
     // Color classes for each variant
     $colorClasses = [
         'solid' => [
-            'bg' => "bg-{$color}-600",
-            'text' => 'text-white',
-            'hover' => "hover:bg-{$color}-700",
-            'focus' => "focus:ring-{$color}-500",
-            'disabled' => "bg-{$color}-300",
+            'bg' => "bg-{$color}-600 dark:bg-{$color}-500",
+            'text' => 'text-white dark:text-white',
+            'hover' => "hover:bg-{$color}-700 dark:hover:bg-{$color}-600",
+            'focus' => "focus:ring-{$color}-500 dark:focus:ring-{$color}-400",
+            'disabled' => "bg-{$color}-300 dark:bg-{$color}-300",
         ],
         'outline' => [
             'bg' => 'bg-transparent',
-            'text' => "text-{$color}-600",
-            'border' => "border border-{$color}-600",
-            'hover' => "hover:bg-{$color}-50",
-            'focus' => "focus:ring-{$color}-500",
-            'disabled' => "text-{$color}-300 border-{$color}-300",
+            'text' => "text-{$color}-600 dark:text-{$color}-400",
+            'border' => "border border-{$color}-600 dark:border-{$color}-400",
+            'hover' => "hover:bg-{$color}-50 dark:hover:bg-{$color}-800",
+            'focus' => "focus:ring-{$color}-500 dark:focus:ring-{$color}-400",
+            'disabled' => "text-{$color}-300 border-{$color}-300 dark:text-{$color}-500 dark:border-{$color}-500",
         ],
         'gradient' => [
-            'bg' => "bg-gradient-to-{$gradientDirection} from-{$color}-500 to-{$color}-600",
-            'text' => 'text-white',
-            'hover' => "hover:from-{$color}-600 hover:to-{$color}-700",
-            'focus' => "focus:ring-{$color}-500",
-            'disabled' => "bg-{$color}-300",
+            'bg' => "bg-gradient-to-{$gradientDirection} from-{$color}-500 to-{$color}-600 dark:from-{$color}-600 dark:to-{$color}-700",
+            'text' => 'text-white dark:text-white',
+            'hover' => "hover:from-{$color}-600 hover:to-{$color}-700 dark:hover:from-{$color}-700 dark:hover:to-{$color}-800",
+            'focus' => "focus:ring-{$color}-500 dark:focus:ring-{$color}-400",
+            'disabled' => "bg-{$color}-300 dark:bg-{$color}-300",
         ],
     ];
 

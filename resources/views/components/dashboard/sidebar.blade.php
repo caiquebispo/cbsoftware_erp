@@ -34,7 +34,7 @@
     <!-- Sidebar -->
     <div
         id="sidebar"
-        class="z-40 w-64 bg-indigo-800 text-white transform transition-transform duration-300 ease-in-out flex flex-col h-full
+        class="z-40 w-64 bg-indigo-800 text-white dark:bg-indigo-900 dark:text-gray-100 transform transition-transform duration-300 ease-in-out flex flex-col h-full
            fixed inset-y-0 left-0 md:relative md:translate-x-0"
         :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
     >
@@ -42,7 +42,7 @@
         <div class="flex justify-end md:hidden px-4 pt-4">
             <button
                 @click="sidebarOpen = false"
-                class="text-white text-xl transition-transform"
+                class="text-white text-xl transition-transform dark:text-gray-100"
             >
                 <i class="fas fa-times"></i>
             </button>
@@ -52,8 +52,8 @@
         <div class="py-4 px-4">
             @if($logo)
                 <div class="flex items-center space-x-2">
-                    <i class="fas fa-rocket text-2xl text-indigo-300"></i>
-                    <span class="text-xl font-bold">Guimepa App</span>
+                    <i class="fas fa-rocket text-2xl text-indigo-300 dark:text-indigo-500"></i>
+                    <span class="text-xl font-bold text-white dark:text-gray-100">Guimepa App</span>
                 </div>
             @endif
         </div>
@@ -75,10 +75,10 @@
 
         <!-- Rodapé com versão -->
         @if($showVersion)
-            <div class="px-4 py-3 border-t border-indigo-700 bg-indigo-900 text-xs text-indigo-300">
+            <div class="px-4 py-3 border-t border-indigo-700 dark:border-indigo-800 bg-indigo-900 dark:bg-indigo-800 text-xs text-indigo-300 dark:text-indigo-400">
                 <div class="flex justify-between items-center">
                     <span>Versão: {{ $version }}</span>
-                    <span class="text-indigo-400">{{ date('Y') }}</span>
+                    <span class="text-indigo-400 dark:text-indigo-500">{{ date('Y') }}</span>
                 </div>
             </div>
         @endif
