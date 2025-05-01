@@ -63,7 +63,7 @@
                     'submenu' => [
                         [
                             'label' => 'Demonstrativo',
-                            'route' => '',
+                            'route' => route('demonstrative-budget.index'),
                             'active' => 'budgets'
                         ]
                     ],
