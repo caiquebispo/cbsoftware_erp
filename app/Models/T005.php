@@ -13,4 +13,5 @@ class T005 extends Model
     protected $guarded = [];
 
     public $timestamps = false;
+
 }

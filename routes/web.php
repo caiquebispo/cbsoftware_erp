@@ -7,7 +7,13 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Settings\Commercial\MarketplaceController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::redirect('/', '/panel/dashboard');
+
+Route::get('/debug', function (){
+
+    return \App\Models\GMP033::query()->whereBetween('GMP033_Data_Emissao', ['2025-05-01','2025-05-01'])->first();
+});
 
 Route::controller(HomeController::class)->group(function (){
 
@@ -24,9 +30,12 @@ Route::controller(MarketplaceController::class)->group(function (){
 Route::controller(DemonstrativeController::class)->group(function (){
 
     Route::get('/panel/crm/orders/demonstrative', 'index')->name('demonstrative.index');
+    Route::get('/panel/crm/orders/demonstrative/getDataIndicators', 'getDataIndicators');
+    Route::get('/panel/crm/orders/demonstrative/getDataChart', 'getDataChart');
 });
 
 Route::controller(DemonstrativeBudgetsController::class)->group(function (){
 
     Route::get('/panel/crm/budgets/demonstrative', 'index')->name('demonstrative-budget.index');
+
 });

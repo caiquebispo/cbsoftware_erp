@@ -15,7 +15,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title> Guimepa - @yield('title')</title>
+    <title> CB Software - @yield('title')</title>
 
     <!-- Tailwind CSS -->
     <script src="{{asset('dependencies/js/tailwind-3.4.16.js')}}"></script>

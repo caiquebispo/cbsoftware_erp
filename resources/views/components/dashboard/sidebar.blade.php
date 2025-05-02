@@ -53,7 +53,7 @@
             @if($logo)
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-rocket text-2xl text-indigo-300 dark:text-indigo-500"></i>
-                    <span class="text-xl font-bold text-white dark:text-gray-100">Guimepa App</span>
+                    <span class="text-xl font-bold text-white dark:text-gray-100">Cb Software App</span>
                 </div>
             @endif
         </div>

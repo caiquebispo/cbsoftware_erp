@@ -30,7 +30,7 @@ let Utils = (function (){
             if (show) {
                 $('#loading').fadeIn();
             } else {
-                $('#loading').fadOut();
+                $('#loading').fadeOut();
             }
         }
     }

@@ -48,10 +48,10 @@
             'xl': 'max-w-5xl',
             'full': 'max-w-full'
         };
-        modal.find('.modal-size').removeClass(Object.values(sizes).addClass(sizes[size] || sizes['md']);
+        // modal.find('.modal-size').removeClass(Object.values(sizes).addClass(sizes[size] || sizes['md']);
 
         // Mostrar/ocultar footer
-        modal.find('.modal-footer').toggleClass('hidden', !showFooter);
+        // modal.find('.modal-footer').toggleClass('hidden', !showFooter);
 
         // Animação de entrada
         modal.fadeIn();
