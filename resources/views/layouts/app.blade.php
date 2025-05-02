@@ -1,5 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR"  x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }"
+      x-bind:class="{ 'dark': darkMode }"
+      x-init="() => {
+          // Verifica preferência do sistema se não houver configuração salva
+          if (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              darkMode = true;
+              localStorage.setItem('darkMode', 'true');
+          }
+          document.documentElement.classList.toggle('dark', darkMode);
+      }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,28 +18,44 @@
     <title> Guimepa - @yield('title')</title>
 
     <!-- Tailwind CSS -->
-    <script src="{{asset('dependences/js/tailwind-3.4.16.js')}}"></script>
-
+    <script src="{{asset('dependencies/js/tailwind-3.4.16.js')}}"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            100: '#f3f4f6',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <!-- Select2   -->
+    <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <!-- Alpine JS -->
     <script src="//unpkg.com/alpinejs" defer></script>
 
-    <link rel="stylesheet" href="{{asset('dependences/css/dataTables.tailwindcss.css')}}">
+    <link rel="stylesheet" href="{{asset('dependencies/css/dataTables.tailwindcss.css')}}">
 
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    
-    <!-- Configurações vite   -->
+
+    <!-- Configurações vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Injetado Estilos de paginas de maneira global -->
+    <!-- Estilos de páginas -->
     @yield('styles')
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 dark:bg-gray-900 font-sans">
+
 <div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
     <x-dashboard.sidebar version="v0.0.1" :menuItems="[
@@ -52,7 +77,7 @@
                     'submenu' => [
                         [
                             'label' => 'Demonstrativo',
-                            'route' => '',
+                            'route' => route('demonstrative.index'),
                             'active' => 'orders'
                         ]
                     ],
@@ -63,12 +88,11 @@
                     'submenu' => [
                         [
                             'label' => 'Demonstrativo',
-                            'route' => '',
+                            'route' => route('demonstrative-budget.index'),
                             'active' => 'budgets'
                         ]
                     ],
                 ]
-
             ]
         ],[
             'label' => 'Configurações',
@@ -88,11 +112,9 @@
                         ]
                     ]
                 ],
-
             ]
         ]
-    ]
-    "  />
+    ]"  />
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -100,11 +122,12 @@
         <x-dashboard.topbar />
 
         <!-- Content Area -->
-        <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+        <main class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-800">
             @yield('content')
         </main>
     </div>
 </div>
+
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -115,13 +138,15 @@
 
 <script src="{{ asset('js/globals/sidebar.js') }}" type="text/javascript"></script>
 <script src="{{ asset('js/globals/utils.js') }}" type="text/javascript"></script>
-<script src="{{ asset('dependences/js/jquery.dataTables.js') }}" type="text/javascript"></script>
-<script src="{{ asset('dependences/js/dataTables.tailwindcss.js') }}" type="text/javascript"></script>
+<script src="{{ asset('dependencies/js/jquery.dataTables.js') }}" type="text/javascript"></script>
+<script src="{{ asset('dependencies/js/dataTables.tailwindcss.js') }}" type="text/javascript"></script>
 
 {{--Modal--}}
 <x-ui.modal />
-
+{{--loading--}}
+<x-ui.loading />
 @yield('scripts')
+
 <script>
     $(document).ready(function() {
         // Toggle sidebar on mobile
@@ -140,6 +165,7 @@
                 $('#userMenu').addClass('hidden');
             }
         });
+
         $('.modal-close').on('click', function (e){
             e.preventDefault();
             e.stopImmediatePropagation();

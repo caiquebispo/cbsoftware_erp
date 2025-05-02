@@ -13,15 +13,15 @@
     'prefix' => null,
     'containerClass' => 'space-y-2',
     'labelContainerClass' => 'flex items-center',
-    'labelTextClass' => 'block text-sm font-medium text-gray-700',
-    'iconClass' => 'text-gray-500',
+    'labelTextClass' => 'block text-sm font-medium text-gray-700 dark:text-gray-300',
+    'iconClass' => 'text-gray-500 dark:text-gray-400',
     'inputGroupClass' => 'relative rounded-md shadow-sm',
-    'inputClass' => 'block w-full py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-    'suffixClass' => 'absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500 sm:text-sm',
-    'prefixClass' => 'absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500 sm:text-sm',
+    'inputClass' => 'block w-full py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400',
+    'suffixClass' => 'absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500 sm:text-sm dark:text-gray-400',
+    'prefixClass' => 'absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500 sm:text-sm dark:text-gray-400',
     'iconLeftClass' => 'mr-2',
     'iconRightClass' => 'ml-2',
-    'iconInsideClass' => 'absolute inset-y-0 flex items-center pointer-events-none text-gray-500',
+    'iconInsideClass' => 'absolute inset-y-0 flex items-center pointer-events-none text-gray-500 dark:text-gray-400',
     'iconInsideLeftClass' => 'left-0 pl-3',
     'iconInsideRightClass' => 'right-0 pr-3',
 ])
@@ -59,7 +59,7 @@
         @endif
 
         @php
-            $inputPadding = '';
+            $inputPadding = 'px-2';
             if ($prefix) $inputPadding .= ' pl-7';
             if ($prefix) $inputPadding .= ' pr-3';
             if ($suffix) $inputPadding .= ' pr-7';

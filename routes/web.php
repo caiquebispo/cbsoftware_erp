@@ -1,6 +1,8 @@
 <?php
 
 
+use App\Http\Controllers\CRM\Budgets\DemonstrativeController as DemonstrativeBudgetsController;
+use App\Http\Controllers\CRM\Orders\DemonstrativeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Settings\Commercial\MarketplaceController;
 use Illuminate\Support\Facades\Route;
@@ -14,8 +16,17 @@ Route::controller(HomeController::class)->group(function (){
 
 //Marketplaces - IPV
 Route::controller(MarketplaceController::class)->group(function (){
-
     Route::get('/panel/settings/commercial/marketplaces', 'index')->name('marketplaces.index');
     Route::get('/panel/settings/commercial/marketplaces/openModalCreateNewRule', 'openModalCreateNewRule');
     Route::post('/panel/settings/commercial/marketplaces/storeModalCreateNewRule', 'storeModalCreateNewRule');
+});
+
+Route::controller(DemonstrativeController::class)->group(function (){
+
+    Route::get('/panel/crm/orders/demonstrative', 'index')->name('demonstrative.index');
+});
+
+Route::controller(DemonstrativeBudgetsController::class)->group(function (){
+
+    Route::get('/panel/crm/budgets/demonstrative', 'index')->name('demonstrative-budget.index');
 });

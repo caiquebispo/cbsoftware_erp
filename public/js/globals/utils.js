@@ -25,6 +25,13 @@ let Utils = (function (){
                     $input.after($errorDiv);
                 }
             });
+        },
+        loading: function (show) {
+            if (show) {
+                $('#loading').fadeIn();
+            } else {
+                $('#loading').fadOut();
+            }
         }
     }
 })()

@@ -16,8 +16,8 @@
         <!-- Item com submenu -->
         <button
             @click="$store.sidebar.toggleMenu('{{ $menuKey }}')"
-            class="flex items-center justify-between w-full px-4 py-3 text-indigo-200 hover:bg-indigo-700 hover:text-white rounded-lg transition duration-200"
-            :class="{ 'bg-indigo-900 text-white': $store.sidebar.isMenuOpen('{{ $menuKey }}') || {{ $isActive ? 'true' : 'false' }} }"
+            class="flex items-center justify-between w-full px-4 py-3 text-indigo-200 dark:text-indigo-300 hover:bg-indigo-700 hover:text-white dark:hover:bg-indigo-800 dark:hover:text-white rounded-lg transition duration-200"
+            :class="{ 'bg-indigo-900 text-white dark:bg-indigo-800 dark:text-gray-100': $store.sidebar.isMenuOpen('{{ $menuKey }}') || {{ $isActive ? 'true' : 'false' }} }"
             data-menu-active="{{ $isActive ? $menuKey : '' }}"
         >
             <div class="flex items-center space-x-2">
@@ -47,8 +47,8 @@
         <!-- Item simples -->
         <a
             href="{{ $item['route'] ?? '#' }}"
-            class="flex items-center space-x-2 px-4 py-3 text-indigo-200 hover:bg-indigo-700 hover:text-white rounded-lg transition duration-200"
-            :class="{ 'bg-indigo-900 text-white': {{ $isActive ? 'true' : 'false' }} }"
+            class="flex items-center space-x-2 px-4 py-3 text-indigo-200 dark:text-indigo-300 hover:bg-indigo-700 hover:text-white dark:hover:bg-indigo-800 dark:hover:text-white rounded-lg transition duration-200"
+            :class="{ 'bg-indigo-900 text-white dark:bg-indigo-800 dark:text-gray-100': {{ $isActive ? 'true' : 'false' }} }"
         >
             @if($item['icon'] ?? false)
                 <i class="{{ $item['icon'] }}"></i>
