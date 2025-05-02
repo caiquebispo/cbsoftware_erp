@@ -17,7 +17,7 @@
         </div>
     </x-ui.section>
 
-    <x-ui.section collapsed="true" class="my-6">
+    <x-ui.section class="my-6">
         <x-slot:header>
             <x-ui.section-header title="Indicadores de Performance" icon="fa-solid fa-chart-line" />
         </x-slot:header>

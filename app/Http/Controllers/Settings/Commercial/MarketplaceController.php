@@ -44,8 +44,8 @@ class MarketplaceController extends Controller
         $channels = $this->channelsServices->channels();
 
         $view = view('panel.settings.commercial.marketplaces.modals.createNewRule',
-            compact('channels'))
-            ->render();
+                compact('channels'))
+                ->render();
 
         return response()
             ->json(['view' => $view], 200);
