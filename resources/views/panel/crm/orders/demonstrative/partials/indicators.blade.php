@@ -20,7 +20,7 @@
         border-color="red"
         :change="$indicators['variation_cost']"
         :comparison="$indicators['cost_total_last']"
-        :positive="$indicators['variation_cost_is_negative']"
+        :positive="abs(!$indicators['variation_cost_is_negative'])"
     />
     <x-ui.performance-indicators
         title="Lucro Total"

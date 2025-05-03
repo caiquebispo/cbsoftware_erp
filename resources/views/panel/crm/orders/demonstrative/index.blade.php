@@ -11,7 +11,13 @@
         <div class="flex flex-col md:flex-row gap-5">
             <x-ui.input type="text" name="orders_id" placeholder="315879" icon="fa-solid fa-magnifying-glass" label="Pedido" class="w-full px-2" />
             <x-ui.input type="text" name="periods" icon="fa-solid fa-calendar-days" label="Data de Emissão" class="w-full" />
+            <x-ui.select :options="[
+                ['value' => 'year', 'label' => 'Ano anterior'],
+                ['value' => 'months', 'label' => 'Mês anterior']
+                ]"
+             name="select-comparision" label="Tipo de Comparitvo" icon="fa-solid fa-calendar-days" class="w-full" id="select_comparision" optionValue="value" optionLabel="label" selected="year"/>
         </div>
+
         <div class="flex justify-end">
             <x-ui.button class="mt-4 btn-search" text="Pesquisar" icon="fa-solid fa-filter" color="green" />
         </div>
@@ -26,10 +32,12 @@
 
     </x-ui.section>
 
-    <x-ui.section collapsed="true">
+    <x-ui.section>
         <x-slot:header>
             <x-ui.section-header title="Gráfico" icon="fa-solid fa-chart-bar" />
         </x-slot:header>
+
+        <div class="content-chart" style="height: 450px"></div>
     </x-ui.section>
 
     <x-ui.section class="my-6" collapsed="true">

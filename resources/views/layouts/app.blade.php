@@ -141,6 +141,8 @@
 <script src="{{ asset('dependencies/js/jquery.dataTables.js') }}" type="text/javascript"></script>
 <script src="{{ asset('dependencies/js/dataTables.tailwindcss.js') }}" type="text/javascript"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
 {{--Modal--}}
 <x-ui.modal />
 {{--loading--}}
