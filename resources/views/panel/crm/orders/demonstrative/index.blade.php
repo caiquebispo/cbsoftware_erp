@@ -13,7 +13,7 @@
             <x-ui.input type="text" name="periods" icon="fa-solid fa-calendar-days" label="Data de Emissão" class="w-full" />
             <x-ui.select :options="[
                 ['value' => 'year', 'label' => 'Ano anterior'],
-                ['value' => 'months', 'label' => 'Mês anterior']
+                ['value' => 'months', 'label' => 'Mês anterior'],
                 ]"
              name="select-comparision" label="Tipo de Comparitvo" icon="fa-solid fa-calendar-days" class="w-full" id="select_comparision" optionValue="value" optionLabel="label" selected="year"/>
         </div>
@@ -36,7 +36,25 @@
         <x-slot:header>
             <x-ui.section-header title="Gráfico" icon="fa-solid fa-chart-bar" />
         </x-slot:header>
+        <div class="flex items-center flex-col md:flex-row gap-5">
+            <x-ui.select :options="[
+                ['value' => 'total_sales', 'label' => 'Venda'],
+                ['value' => 'cost_total', 'label' => 'Custo'],
+                ['value' => 'profit', 'label' => 'Lucro'],
+                ['value' => 'margin', 'label' => 'Margem'],
+                ['value' => 'ipv', 'label' => 'IPV'],
+            ]" name="indicator_1" label="Indicador 1" icon="fa-solid fa" class="w-full" id="indicator_1" optionValue="value" optionLabel="label" selected="total_sales"/>
 
+            <x-ui.select :options="[
+                ['value' => 'total_sales_last', 'label' => 'Venda'],
+                ['value' => 'cost_total_last', 'label' => 'Custo'],
+                ['value' => 'profit_last', 'label' => 'Lucro'],
+                ['value' => 'margin_last', 'label' => 'Margem'],
+                ['value' => 'ipv_last', 'label' => 'IPV'],
+            ]" name="indicator_2" label="Indicador 2" icon="fa-solid fa" class="w-full" id="indicator_2" optionValue="value" optionLabel="label" selected="total_sales_last"/>
+
+            <x-ui.checkbox name="actualPeriod" id="actualPeriod" label="Periodo Atual?" :checked="true" containerClass="flex items-center bg-white"/>
+        </div>
         <div class="content-chart" style="height: 450px"></div>
     </x-ui.section>
 

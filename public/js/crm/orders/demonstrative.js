@@ -72,22 +72,78 @@ let Demonstrative = (function () {
                 success: function (data){
 
                     Utils.loading(false);
-                    $('.content-chart').html('');
-                    Demonstrative.makeChart(data['data']);
+
+                    let indicator_1 = $("#indicator_1 option:selected").val();
+                    let indicator_2 = $("#indicator_2 option:selected").val();
+
+                    $("#indicator_1").on('change', function (e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+
+                        indicator_1 = $(this).find("option:selected").val();
+                        Demonstrative.makeChart(data['data'], comparasion, indicator_1, indicator_2);
+                    })
+                    $("#indicator_2").on('change', function (e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+
+                        indicator_2 = $(this).find("option:selected").val();
+                        Demonstrative.makeChart(data['data'], comparasion, indicator_1, indicator_2);
+                    })
+
+                    Demonstrative.makeChart(data['data'], comparasion, indicator_1, indicator_2);
                 },
                 error: function (error){
                     console.error('Error:', error);
                 }
             })
         },
-        makeChart: function (data){
+        makeChart: function (data, comparasion, indicator_1 = "total_sales", indicator_2 = "total_sales_last"){
+
+            $('.content-chart').html('');
 
             const key = data[0].day ? "day" : "month";
 
             const categories = data.map(item => item[key]);
-            const currentSales = data.map(item => item.total_sales);
-            const lastSales = data.map(item => item.total_sales_last);
+            const currentSales = data.map(item => item[indicator_1]);
+            const lastSales = data.map(item => item[indicator_2]);
+            let tile_1 = "Vendas"
+            switch (indicator_1) {
+                case "total_sales":
+                    tile_1 = "Vendas"
+                    break;
+                case "cost_total":
+                    tile_1 = "Custo"
+                    break;
+                case "profit":
+                    tile_1 = "Lucro"
+                    break;
+                case "margin":
+                    tile_1 = "Margem"
+                    break;
+                case "ipv":
+                    tile_1 = "IPV"
+                    break;
+            }
+            let tile_2 = "Vendas"
+            switch (indicator_2) {
 
+                case "total_sales_last":
+                    tile_2 = "Vendas"
+                    break;
+                case "cost_total_last":
+                    tile_2 = "Custo"
+                    break;
+                case "profit_last":
+                    tile_2 = "Lucro"
+                    break;
+                case "margin_last":
+                    tile_2 = "Margem"
+                    break;
+                case "ipv_last":
+                    tile_2 = "IPV"
+                    break;
+            }
             const options = {
                 chart: {
                     height: 420,
@@ -102,12 +158,12 @@ let Demonstrative = (function () {
                 },
                 series: [
                     {
-                        name: "Vendas Atuais",
+                        name: tile_1,
                         type: "column",
                         data: currentSales
                     },
                     {
-                        name: "Vendas Anteriores",
+                        name: tile_2,
                         type: "line",
                         data: lastSales
                     }
@@ -155,7 +211,7 @@ let Demonstrative = (function () {
                     horizontalAlign: 'right'
                 },
                 title: {
-                    text: `Comparativo de Vendas (${key === "day" ? "Diário" : "Mensal"})`,
+                    text: `Comparativo de Vendas (${key === "day" ? "Diário" : "Mensal"}) - (${comparasion === "year" ? "Ano Atual X Anterior" : "Mês Atual X Anterior"})`,
                     align: 'center',
                     style: {
                         fontSize: '18px',
