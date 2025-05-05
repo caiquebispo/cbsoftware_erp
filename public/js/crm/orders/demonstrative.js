@@ -32,12 +32,14 @@ let Demonstrative = (function () {
 
                 comparasion = $(this).find("option:selected").val();
             })
+
             $('#is_grouped_data').on('change', function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
 
                 Demonstrative.getDataTable(start.format('YYYY-MM-DD'),end.format('YYYY-MM-DD'), $(this).find("option:selected").val());
             })
+
             $('.btn-search').on('click', function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -79,29 +81,14 @@ let Demonstrative = (function () {
                 method: 'GET',
                 data:{'start':start,'end':end, 'comparasion': comparasion},
                 success: function (response){
+
                     var data = response.data
+
                     Utils.loading(false);
 
-                    let indicator_1 = $("#indicator_1 option:selected").val();
-                    let indicator_2 = $("#indicator_2 option:selected").val();
-
-                    $("#indicator_1").on('change', function (e) {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-
-                        indicator_1 = $(this).find("option:selected").val();
-                        Demonstrative.makeChart(data, comparasion, indicator_1, indicator_2);
-                    })
-                    $("#indicator_2").on('change', function (e) {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-
-                        indicator_2 = $(this).find("option:selected").val();
-                        Demonstrative.makeChart(data, comparasion, indicator_1, indicator_2);
-                    })
                     const groupedData = Demonstrative.groupDataByMonth(data);
-                    Demonstrative.createPieCharts(groupedData);
-                    Demonstrative.makeChart(data, comparasion, indicator_1, indicator_2);
+                    Demonstrative.createPieCharts(groupedData,comparasion);
+                    Demonstrative.makeChart(data, comparasion);
                 },
                 error: function (error){
                     console.error('Error:', error);
@@ -139,16 +126,17 @@ let Demonstrative = (function () {
                 current: {
                     profit: data.reduce((sum, item) => sum + item.profit, 0),
                     margin: (data.reduce((sum, item) => sum + item.profit, 0) / data.reduce((sum, item) => sum + item.total_sales, 0)) * 100,
-                    ipv: data.reduce((sum, item) => sum + item.ipv, 0) / data.length // Média do IPV
+                    ipv: (data.reduce((sum, item) => sum + item.total_sales, 0) / data.reduce((sum, item) => sum + item.cost_total, 0))
                 },
                 last: {
                     profit: data.reduce((sum, item) => sum + item.profit_last, 0),
                     margin: (data.reduce((sum, item) => sum + item.profit_last, 0) / data.reduce((sum, item) => sum + item.total_sales_last, 0)) * 100,
-                    ipv: data.reduce((sum, item) => sum + item.ipv_last, 0) / data.length // Média do IPV anterior
+                    ipv: (data.reduce((sum, item) => sum + item.total_sales_last, 0) / data.reduce((sum, item) => sum + item.cost_total_last, 0))
                 }
             };
         },
-        createPieCharts: function(grouped) {
+        createPieCharts: function(grouped,comparasion) {
+            const title = comparasion == 'year' ? 'Ano Anterior' : 'Mês Anterior';
 
             const commonOptions = {
                 chart: { type: 'pie', height: 300 },
@@ -163,23 +151,23 @@ let Demonstrative = (function () {
             new ApexCharts(document.querySelector("#profitChart"), {
                 ...commonOptions,
                 series: [grouped.current.profit, grouped.last.profit],
-                labels: ['Mês Atual', 'Mês Anterior'],
-                title: { text: 'Comparativo de Lucro', align: 'center' },
+                labels: ['Mês Atual', title],
+                title: { text: 'Comparativo de LUCRO', align: 'center' },
                 tooltip: { y: { formatter: (val) => `R$ ${val.toLocaleString()}` } }
             }).render();
 
             new ApexCharts(document.querySelector("#marginChart"), {
                 ...commonOptions,
                 series: [grouped.current.margin, grouped.last.margin],
-                labels: ['Mês Atual', 'Mês Anterior'],
-                title: { text: 'Comparativo de Margem (%)', align: 'center' },
+                labels: ['Mês Atual', title],
+                title: { text: 'Comparativo de MARGEM (%)', align: 'center' },
                 dataLabels: { formatter: (val) => `${val.toFixed(2)}%` }
             }).render();
 
             new ApexCharts(document.querySelector("#ipvChart"), {
                 ...commonOptions,
                 series: [grouped.current.ipv, grouped.last.ipv],
-                labels: ['Mês Atual', 'Mês Anterior'],
+                labels: ['Mês Atual', title],
                 title: { text: 'Comparativo de IPV', align: 'center' },
                 tooltip: { y: { formatter: (val) => val.toFixed(3) } }
             }).render();
@@ -204,7 +192,7 @@ let Demonstrative = (function () {
                     tile_1 = "Custo"
                     break;
                 case "profit":
-                    tile_1 = "Lucro"
+                    tile_1 = "LUCRO"
                     break;
                 case "margin":
                     tile_1 = "Margem"
@@ -223,7 +211,7 @@ let Demonstrative = (function () {
                     tile_2 = "Custo"
                     break;
                 case "profit_last":
-                    tile_2 = "Lucro"
+                    tile_2 = "LUCRO"
                     break;
                 case "margin_last":
                     tile_2 = "Margem"
@@ -338,28 +326,24 @@ let Demonstrative = (function () {
                         defaultContent: '<span>+</span>',
                         width: '60px'
                     },
-                    { title: 'Data Emissão', data: 'data_emissao' },
+                    { title: 'DATA EMISSÃO', data: 'data_emissao' },
                     {
-                        title: 'Total Vendas',
+                        title: 'TOTAL VENDAS',
                         data: 'total_sales',
                         render: data => formatValue(data, 'currency')
-                    },
-                    {
-                        title: 'Custo Total',
+                    },{
+                        title: 'TOTAL CUSTO',
                         data: 'cost_total',
                         render: data => formatValue(data, 'currency')
-                    },
-                    {
-                        title: 'Lucro',
+                    },{
+                        title: 'LUCRO',
                         data: 'profit',
                         render: data => formatValue(data, 'currency')
-                    },
-                    {
-                        title: 'Margem (%)',
+                    },{
+                        title: 'MARGEM (%)',
                         data: 'margin',
                         render: data => formatValue(data, 'percentage')
-                    },
-                    {
+                    },{
                         title: 'IPV',
                         data: 'ipv',
                         render: data => formatValue(data)
@@ -376,7 +360,7 @@ let Demonstrative = (function () {
                     $(this).html('<span>+</span>');
 
                 } else {
-                    console.log('Row data:', row.data());
+
                     const rowData = row.data();
 
                     if (!rowData.resume || typeof rowData.resume !== 'object') {
@@ -386,44 +370,56 @@ let Demonstrative = (function () {
                         $(this).html('<span>-</span>');
                         return;
                     }
-
                     // Prepara os dados com fallbacks seguros
                     const subtableData = Object.values(rowData.resume).map(item => ({
+                        cod_order: item.cod_order || 0,
+                        cod_product: item.cod_product || 0,
+                        id_product: item.id_product || 0,
+                        name: item.name || 0,
                         total_sales: item.total_sales || 0,
                         cost_total: item.cost_total || 0,
                         profit: item.profit || 0,
                         margin: item.margin || 0,
-                        ipv: item.hasOwnProperty('ipv') ? item.ipv : 0 // Fallback explícito para ipv
-                    })).filter(fn => fn.total_sales !== 0 || fn.cost_total !== 0 || fn.profit !== 0 || fn.margin !== 0 || fn.ipv !== 0);
+                        ipv: item.hasOwnProperty('ipv') ? item.ipv : 0
+                    })).filter(fn => fn.total_sales !== 0 || fn.cost_total !== 0 || fn.profit !== 0 || fn.margin !== 0 || fn.ipv !== 0 || fn.cod_order !== 0 || fn.cod_product !== 0 || fn.id_product !== 0|| fn.name !== 0);
 
                     const subtableContainer = $('<div class="subtable-container p-6"/>');
 
                     // Inicializa a subtabela
                     const initSubTable = () => {
+                        console.log('row 1',rowData.resume)
                         subtableContainer.find('table').DataTable({
                             data: subtableData,
                             columns: [
                                 {
-                                    title: 'Total Vendas',
+                                    title: 'PEDIDO',
+                                    data: 'cod_order',
+                                },{
+                                    title: 'SKU',
+                                    data: 'cod_product',
+                                },{
+                                    title: 'ID PRODUTO',
+                                    data: 'id_product',
+                                },{
+                                    title: 'PRODUTO',
+                                    data: 'name',
+                                },{
+                                    title: 'TOTAL VENDAS',
                                     data: 'total_sales',
                                     render: data => formatValue(data, 'currency')
-                                },
-                                {
-                                    title: 'Custo Total',
+                                },{
+                                    title: 'TOTAL CUSTO',
                                     data: 'cost_total',
                                     render: data => formatValue(data, 'currency')
-                                },
-                                {
-                                    title: 'Lucro',
+                                },{
+                                    title: 'LUCRO',
                                     data: 'profit',
                                     render: data => formatValue(data, 'currency')
-                                },
-                                {
-                                    title: 'Margem (%)',
+                                },{
+                                    title: 'MARGEM (%)',
                                     data: 'margin',
                                     render: data => formatValue(data, 'percentage')
-                                },
-                                {
+                                },{
                                     title: 'IPV',
                                     data: 'ipv',
                                     render: data => formatValue(data)
@@ -460,28 +456,36 @@ let Demonstrative = (function () {
                 },
                 data: response.data,
                 columns: [
-                    { title: 'Data Emissão', data: 'data_emissao' },
+                    { title: 'DATA EMISSÃO', data: 'data_emissao' },
                     {
-                        title: 'Total Vendas',
+                        title: 'PEDIDO',
+                        data: 'cod_order',
+                    },{
+                        title: 'SKU',
+                        data: 'cod_product',
+                    },{
+                        title: 'ID PRODUTO',
+                        data: 'id_product',
+                    },{
+                        title: 'PRODUTO',
+                        data: 'name',
+                    },{
+                        title: 'TOTAL VENDAS',
                         data: 'total_sales',
                         render: data => formatValue(data, 'currency')
-                    },
-                    {
-                        title: 'Custo Total',
+                    },{
+                        title: 'TOTAL CUSTO',
                         data: 'cost_total',
                         render: data => formatValue(data, 'currency')
-                    },
-                    {
-                        title: 'Lucro',
+                    },{
+                        title: 'LUCRO',
                         data: 'profit',
                         render: data => formatValue(data, 'currency')
-                    },
-                    {
-                        title: 'Margem (%)',
+                    },{
+                        title: 'MARGEM (%)',
                         data: 'margin',
                         render: data => formatValue(data, 'percentage')
-                    },
-                    {
+                    },{
                         title: 'IPV',
                         data: 'ipv',
                         render: data => formatValue(data)

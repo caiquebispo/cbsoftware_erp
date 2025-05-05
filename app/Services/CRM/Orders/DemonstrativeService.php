@@ -221,6 +221,10 @@ class DemonstrativeService
             $array[] = [
                 'id' => $key,
                 'data_emissao' => $item->GMP033_Data_Emissao,
+                'cod_order' => $item->GMP033_T005_Id,
+                'cod_product' => $item->D001_Codigo_Produto,
+                'id_product'=>$item->GMP033_T006_Id,
+                'name'=> $item->T006_Descricao_Produto,
                 'total_sales' => $item->GMP033_Venda_Total,
                 'cost_total' => $item->GMP033_Custo_Total,
                 'profit' => $item->GMP033_Lucro,
@@ -229,6 +233,10 @@ class DemonstrativeService
                 'resume' => [
                     [
                         'total_sales' => $item->GMP033_Venda_Total,
+                        'cod_order' => $item->GMP033_T005_Id,
+                        'cod_product' => $item->D001_Codigo_Produto,
+                        'id_product'=>$item->GMP033_T006_Id,
+                        'name'=> $item->T006_Descricao_Produto,
                         'cost_total' => $item->GMP033_Custo_Total,
                         'profit' => $item->GMP033_Lucro,
                         'margin' => ($item->GMP033_Venda_Total != 0) ? ($item->GMP033_Lucro / $item->GMP033_Venda_Total) * 100 : 0,
@@ -264,6 +272,10 @@ class DemonstrativeService
         $array[] = [
             'id' => $key,
             'data_emissao' => $item->GMP033_Data_Emissao,
+            'cod_order' => $item->GMP033_T005_Id,
+            'cod_product' => $item->D001_Codigo_Produto,
+            'id_product'=>$item->GMP033_T006_Id,
+            'name'=> $item->T006_Descricao_Produto,
             'total_sales' => $item->GMP033_Venda_Total,
             'cost_total' => $item->GMP033_Custo_Total,
             'profit' => $item->GMP033_Lucro,
@@ -281,7 +293,7 @@ class DemonstrativeService
     private function getData(string $start, string $end): Collection
     {
         return GMP033::query()
-            ->select('gmp033.*', 'T005_T005_Id_Agrupado', 'T005_Canal_Vendas_Ecommerce','T005_Nome_Status') // Ou especifique apenas as colunas que precisa
+            ->select('gmp033.*', 'T005_T005_Id_Agrupado', 'T005_Canal_Vendas_Ecommerce','T005_Nome_Status','D001_Codigo_Produto','T005_Canal_Vendas_Ecommerce','T006_Descricao_Produto')
             ->whereBetween('GMP033_Data_Emissao', [$start, $end])
             ->join('T005', function($join) {
                 $join->on('T005.T005_Id', '=', 'gmp033.GMP033_T005_Id')
@@ -293,6 +305,12 @@ class DemonstrativeService
                             ->orWhereNull('T005.T005_T005_Id_Agrupado');
                     });
             })
+            ->leftJoin('T006', 'T006_Id', '=', 'GMP033_T006_Id')
+            ->leftJoin('D009', 'D009_Id', '=', 'T006_D009_Id')
+            ->leftJoin('D049', 'D049_Id', '=', 'D009_D049_Id')
+            ->leftJoin('D082', 'D082_Id', '=', 'D049_D082_Id')
+            ->leftJoin('D001', 'D001_Id', '=', 'D049_D001_Id')
+            ->leftJoin('D001A', 'D001A_D001_Id', '=', 'D001_Id')
             ->get();
     }
 
