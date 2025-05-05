@@ -14,28 +14,45 @@ class DemonstrativeController extends Controller
     {
         try {
 
-           $indicators = (new DemonstrativeService(...$request->all()))->getDataIndicators();
+           $indicators = (new DemonstrativeService())
+               ->getDataIndicators(...$request->all());
+
            $view = view('panel.crm.orders.demonstrative.partials.indicators',compact('indicators'))->render();
 
            return response()->json(['view' => $view], 200);
 
         } catch (\Exception $e) {
+
             return response()->json([
                 'Error' => false,
                 'message' => 'Erro interno, favor entrar em contato com nosso suporte',
             ], 500);
         }
     }
-    public function getDataChart(Request $request)
+    public function getDataChart(Request $request): JsonResponse
     {
         try {
 
-           return $indicators = (new DemonstrativeService(...$request->all()))->getDataChart(...$request->all());
-           $view = view('panel.crm.orders.demonstrative.partials.indicators',compact('indicators'))->render();
-
-           return response()->json(['view' => $view], 200);
+           $dataChart = (new DemonstrativeService())->getDataChart(...$request->all());
+           return response()->json(['data' => $dataChart], 200);
 
         } catch (\Exception $e) {
+
+            return response()->json([
+                'Error' => false,
+                'message' => 'Erro interno, favor entrar em contato com nosso suporte',
+            ], 500);
+        }
+    }
+    public function getDataTable(Request $request): JsonResponse
+    {
+        try {
+
+            $dataTable = (new DemonstrativeService())->getDataTable(...$request->all());
+            return response()->json(['data' => $dataTable], 200);
+
+        } catch (\Exception $e) {
+
             return response()->json([
                 'Error' => false,
                 'message' => 'Erro interno, favor entrar em contato com nosso suporte',

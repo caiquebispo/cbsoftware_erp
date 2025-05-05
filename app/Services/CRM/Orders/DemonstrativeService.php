@@ -4,121 +4,285 @@ namespace App\Services\CRM\Orders;
 
 use App\Models\GMP033;
 use Illuminate\Support\Collection;
+use JetBrains\PhpStorm\ArrayShape;
 
 class DemonstrativeService
 {
-    public function __construct(
-        public string $start,
-        public string $end,
-    )
+    public function __construct()
     {}
-    public function getDataIndicators(): array
+
+    /**
+     * @param string $start
+     * @param string $end
+     * @param string $comparasion
+     * @return array
+     * @throws \DateMalformedStringException
+     */
+    public function getDataIndicators(string $start, string $end, string $comparasion = 'year'): array
     {
-        $payload = $this->getData();
-        $payload_last = $this->getData(true);
-        $data = [
-            'total_sales' =>  $payload->sum('GMP033_Venda_Total'),
-            'cost_total' =>  $payload->sum('GMP033_Custo_Total'),
-            'profit' => $payload->sum('GMP033_Lucro'),
-            'margin' => $this->getValuePercentage($payload->sum('GMP033_Lucro'),$payload->sum('GMP033_Venda_Total'), false, true),
-            'ipv' => $this->getValuePercentage($payload->sum('GMP033_Venda_Total'),$payload->sum('GMP033_Custo_Total'),true),
-            'total_sales_last' => $payload_last->sum('GMP033_Venda_Total'),
-            'cost_total_last' => $payload_last->sum('GMP033_Custo_Total'),
-            'profit_last' => $payload_last->sum('GMP033_Lucro'),
-            'margin_last' => $this->getValuePercentage($payload_last->sum('GMP033_Lucro'),$payload_last->sum('GMP033_Venda_Total'), false, true),
-            'ipv_last' => $this->getValuePercentage($payload_last->sum('GMP033_Venda_Total'),$payload_last->sum('GMP033_Custo_Total'),true),
-            'variation_sales' => 0,
-            'variation_sales_is_negative' => false,
-            'variation_cost' => 0,
-            'variation_cost_is_negative' => false,
-            'variation_profit' => 0,
-            'variation_profit_is_negative' => false,
-            'variation_margin' => 0,
-            'variation_margin_is_negative' => false,
-            'variation_ipv' => 0,
-            'variation_ipv_is_negative' => false,
+        $currentStart = new \DateTime($start);
+        $currentEnd = new \DateTime($end);
+
+        $currentData = $this->getData($currentStart->format('Y-m-d'), $currentEnd->format('Y-m-d'));
+        $previousData = $this->getData((clone $currentStart)->modify("-1 {$comparasion}")->format('Y-m-d'), (clone $currentEnd)->modify("-1 {$comparasion}")->format('Y-m-d'));
+
+        $currentSales = $currentData->sum('GMP033_Venda_Total');
+        $currentCost = $currentData->sum('GMP033_Custo_Total');
+        $currentProfit = $currentData->sum('GMP033_Lucro');
+        $currentMargin = $this->getValuePercentage($currentProfit, $currentSales, false, true);
+        $currentIpv = $this->getValuePercentage($currentSales, $currentCost, true);
+
+        $previousSales = $previousData->sum('GMP033_Venda_Total');
+        $previousCost = $previousData->sum('GMP033_Custo_Total');
+        $previousProfit = $previousData->sum('GMP033_Lucro');
+        $previousMargin = $this->getValuePercentage($previousProfit, $previousSales, false, true);
+        $previousIpv = $this->getValuePercentage($previousSales, $previousCost, true);
+
+
+        return [
+
+            'total_sales' => $currentSales,
+            'cost_total' => $currentCost,
+            'profit' => $currentProfit,
+            'margin' => $currentMargin,
+            'ipv' => $currentIpv,
+
+            'total_sales_last' => $previousSales,
+            'cost_total_last' => $previousCost,
+            'profit_last' => $previousProfit,
+            'margin_last' => $previousMargin,
+            'ipv_last' => $previousIpv,
+
+            'variation_sales' => $this->calculateVariation($currentSales, $previousSales)['value'],
+            'variation_sales_is_negative' => $this->calculateVariation($currentSales, $previousSales)['is_negative'],
+            'variation_cost' => $this->calculateVariation($currentCost, $previousCost)['value'],
+            'variation_cost_is_negative' => $this->calculateVariation($currentCost, $previousCost)['is_negative'],
+            'variation_profit' => $this->calculateVariation($currentProfit, $previousProfit)['value'],
+            'variation_profit_is_negative' => $this->calculateVariation($currentProfit, $previousProfit)['is_negative'],
+            'variation_margin' => $this->calculateVariation($currentMargin, $previousMargin, )['value'],
+            'variation_margin_is_negative' => $this->calculateVariation($currentMargin, $previousMargin,)['is_negative'],
+            'variation_ipv' => $this->calculateVariation($currentIpv, $previousIpv)['value'],
+            'variation_ipv_is_negative' => $this->calculateVariation($currentIpv, $previousIpv)['is_negative'],
         ];
-
-        $data['variation_sales'] = $this->getValuePercentage($data['total_sales'], $data['total_sales_last']);
-        $data['variation_sales_is_negative'] = $data['variation_sales'] > 0 ? true : false;
-        $data['variation_cost'] = $this->getValuePercentage($data['cost_total'], $data['cost_total_last']);
-        $data['variation_cost_is_negative'] = $data['variation_cost'] >0 ? true : false;
-        $data['variation_profit'] = $this->getValuePercentage($data['profit'], $data['profit_last']);
-        $data['variation_profit_is_negative'] = $data['variation_profit'] >0 ? true : false;
-        $data['variation_margin'] = $this->getValuePercentage($data['margin'], $data['margin_last']);
-        $data['variation_margin_is_negative'] = $data['variation_margin'] >0 ? true : false;
-        $data['variation_ipv'] = $this->getValuePercentage($data['ipv'], $data['ipv_last'], true);
-        $data['variation_ipv_is_negative'] = $data['variation_ipv'] >0 ? true : false;
-
-        return  $data;
     }
+    #[ArrayShape(['value' => "float", 'is_negative' => "bool"])]
+    private function calculateVariation($current, $previous, bool $is_ipv = false, $is_variation = false): array
+    {
+        return [
+            'value' => $this->getValuePercentage($current, $previous, $is_ipv, $is_variation),
+            'is_negative' => $this->getValuePercentage($current, $previous,$is_ipv, $is_variation) < 0 ? false : true,
+        ];
+    }
+
+    /**
+     * @param float|null $firstValue
+     * @param float|null $secondValue
+     * @param bool $is_ipv
+     * @param $is_variation
+     * @return float
+     */
     private function getValuePercentage(?float $firstValue = 0, ?float $secondValue = 0, bool $is_ipv = false, $is_variation = false): float
     {
         if($is_ipv){
-
             return ($firstValue != 0) ? $firstValue/$secondValue : 0;
         }
-        if($is_variation){
 
+        if($is_variation){
             return ($firstValue != 0) ? ($firstValue/$secondValue) * 100 : 0;
         }
+
         return ($firstValue != 0) ? (($firstValue/$secondValue)-1) * 100 : 0;
     }
 
-    public function getDataChart($start, $end)
+    /**
+     * @param string $start
+     * @param string $end
+     * @param string $comparasion
+     * @return array
+     * @throws \DateMalformedPeriodStringException
+     * @throws \DateMalformedStringException
+     */
+    public function getDataChart(string $start, string $end, string $comparasion = 'year'): array
     {
-        $payload = $this->getData();
-        $payload_last = $this->getData(true);
-//        dd($payload_last[1]);
-        $start = new \DateTime($start);
-        $end = (new \DateTime($end));
 
-        $is_grouped = $start->diff($end)->days > 31 ? true : false;
+
+        $currentStart = new \DateTime($start);
+        $currentEnd = new \DateTime($end);
+
+        $currentData = $this->getData($currentStart->format('Y-m-d'), $currentEnd->format('Y-m-d'));
+        $previousData = $this->getData((clone $currentStart)->modify("-1 {$comparasion}")->format('Y-m-d'), (clone $currentEnd)->modify("-1 {$comparasion}")->format('Y-m-d'));
+
+        $isGrouped = $currentStart->diff($currentEnd)->days > 31;
+
+        $groupFormat = $isGrouped ? 'Y-m' : 'Y-m-d';
+        $groupKey = $isGrouped ? 'month' : 'day';
+
+        $results = [];
 
         $interval = new \DateInterval('P1D');
-        $dateranger = new \DatePeriod($start, $interval, $end);
+        $dateRange = new \DatePeriod($currentStart, $interval, $currentEnd->modify('+1 day'));
 
-        $arr = [];
+        foreach ($dateRange as $date) {
 
-        $type_index = $is_grouped ? 'month' : 'days';
+            $currentPeriod = $date->format($groupFormat);
+            $previousPeriod = (clone $date)->modify("-1 {$comparasion}")->format($groupFormat);
 
-        foreach ($dateranger as $range){
-
-            $search = $is_grouped ?  'Y-m' : 'Y-m-d';
-
-            $index = array_search($range->format($search), array_column($arr, $type_index));
-
-            if($index === false){
-
-                $arr[] =[
-                    $type_index =>  $range->format($search),
-                    'total_sales' =>  $payload->filter(fn($p) => (new \DateTime($p->GMP033_Data_Emissao))->format($search) == $range->format($search))->sum('GMP033_Venda_Total'),
-                    'cost_total' => $payload->filter(fn($p) => (new \DateTime($p->GMP033_Data_Emissao))->format($search) == $range->format($search))->sum('GMP033_Custo_Total'),
-                    'profit' => $payload->filter(fn($p) => (new \DateTime($p->GMP033_Data_Emissao))->format($search) == $range->format($search))->sum('GMP033_Lucro'),
-                    'margin' => 0,
-                    'ipv' => 0,
-                    'total_sales_last' => $payload_last->filter(fn($p) => (new \DateTime($p->GMP033_Data_Emissao))->format($search) == $range->modify('-1 months')->format($search))->sum('GMP033_Venda_Total'),
-                    'cost_total_last' => $payload_last->filter(fn($p) => (new \DateTime($p->GMP033_Data_Emissao))->format($search) == $range->modify('-1 months')->format($search))->sum('GMP033_Custo_Total'),
-                    'profit_last' => $payload_last->filter(fn($p) => (new \DateTime($p->GMP033_Data_Emissao))->format($search) == $range->modify('-1 months')->format($search))->sum('GMP033_Lucro'),
-                    'margin_last' => 0,
-                    'ipv_last' => 0,
-                ];
+            if (isset($results[$currentPeriod])) {
+                continue;
             }
+
+            $currentFilter = function($item) use ($currentPeriod, $groupFormat) {
+                return (new \DateTime($item->GMP033_Data_Emissao))->format($groupFormat) === $currentPeriod;
+            };
+
+            $previousFilter = function($item) use ($previousPeriod, $groupFormat) {
+                return (new \DateTime($item->GMP033_Data_Emissao))->format($groupFormat) === $previousPeriod;
+            };
+
+            $currentSales = $currentData->filter($currentFilter)->sum('GMP033_Venda_Total');
+            $currentCost = $currentData->filter($currentFilter)->sum('GMP033_Custo_Total');
+            $currentProfit = $currentData->filter($currentFilter)->sum('GMP033_Lucro');
+            $currentMargin = $currentSales ? ($currentProfit / $currentSales) * 100 : 0;
+            $currentIpv = $currentCost ? ($currentSales / $currentCost) * 100 : 0;
+
+            $previousSales = $previousData->filter($previousFilter)->sum('GMP033_Venda_Total');
+            $previousCost = $previousData->filter($previousFilter)->sum('GMP033_Custo_Total');
+            $previousProfit = $previousData->filter($previousFilter)->sum('GMP033_Lucro');
+            $previousMargin = $previousSales ? ($previousProfit / $previousSales) * 100 : 0;
+            $previousIpv = $previousCost ? ($previousSales / $previousCost) * 100 : 0;
+
+            // Adiciona ao array de resultados
+            $results[$currentPeriod] = [
+                $groupKey => $currentPeriod,
+                'total_sales' => $currentSales,
+                'cost_total' => $currentCost,
+                'profit' => $currentProfit,
+                'margin' => round($currentMargin, 2),
+                'ipv' => round($currentIpv, 2),
+                'total_sales_last' => $previousSales,
+                'cost_total_last' => $previousCost,
+                'profit_last' => $previousProfit,
+                'margin_last' => round($previousMargin, 2),
+                'ipv_last' => round($previousIpv, 2),
+                'sales_variation' => $previousSales ? round((($currentSales - $previousSales) / $previousSales) * 100, 2) : 0,
+                'margin_variation' => $previousMargin ? round((($currentMargin - $previousMargin) / $previousMargin) * 100, 2) : 0,
+                'ipv_variation' => $previousIpv ? round((($currentIpv - $previousIpv) / $previousIpv) * 100, 2) : 0,
+            ];
         }
 
-        return $arr;
+        return array_values($results);
     }
-    private function getData(bool $periods_comparison = false, string $type = 'months', int $quanity = 1): Collection
+
+    /**
+     * @param string $start
+     * @param string $end
+     * @param $isGrouped
+     * @return array
+     * @throws \DateMalformedStringException
+     */
+    public function getDataTable(string $start, string $end, $isGrouped = false): array
     {
-        if($periods_comparison){
+        $isGrouped = $isGrouped == "true" ? true : false;
 
-            $this->start = (new \DateTime($this->start))->modify("-{$quanity} {$type}")->format('Y-m-d');
-            $this->end = (new \DateTime($this->end))->modify("-{$quanity} {$type}")->modify("+1 days")->format('Y-m-d');
+        $currentStart = new \DateTime($start);
+        $currentEnd = new \DateTime($end);
+
+        $array = [];
+
+        $data = $this->getData($currentStart->format('Y-m-d'), $currentEnd->format('Y-m-d'));
+
+        foreach ($data as $key => $item) {
+
+            if($isGrouped){
+
+                $index = array_search($item->GMP033_Data_Emissao, array_column($array, 'data_emissao'));
+
+                $array = $this->makeDataGrouped($index, $key, $item, $array);
+
+            }else{
+                $array = $this->makeDataBase($key, $item, $array);
+            }
+
         }
+        return  $array;
 
+    }
+
+    /**
+     * @param false|int|string $index
+     * @param int|string|null $key
+     * @param mixed $item
+     * @param array $array
+     * @return array
+     */
+    private function makeDataGrouped(false|int|string $index, int|string|null $key, mixed $item, array $array): array
+    {
+        if ($index === false) {
+            $array[] = [
+                'id' => $key,
+                'data_emissao' => $item->GMP033_Data_Emissao,
+                'total_sales' => $item->GMP033_Venda_Total,
+                'cost_total' => $item->GMP033_Custo_Total,
+                'profit' => $item->GMP033_Lucro,
+                'margin' => ($item->GMP033_Venda_Total != 0) ? ($item->GMP033_Lucro / $item->GMP033_Venda_Total) * 100 : 0,
+                'ipv' => ($item->GMP033_Custo_Total != 0) ? ($item->GMP033_Venda_Total / $item->GMP033_Custo_Total) : 0,
+                'resume' => [
+                    [
+                        'total_sales' => $item->GMP033_Venda_Total,
+                        'cost_total' => $item->GMP033_Custo_Total,
+                        'profit' => $item->GMP033_Lucro,
+                        'margin' => ($item->GMP033_Venda_Total != 0) ? ($item->GMP033_Lucro / $item->GMP033_Venda_Total) * 100 : 0,
+                        'ipv' => ($item->GMP033_Custo_Total != 0) ? ($item->GMP033_Venda_Total / $item->GMP033_Custo_Total) : 0,
+                    ]
+                ]
+            ];
+        } else {
+            $array[$index]['total_sales'] += $item->GMP033_Venda_Total;
+            $array[$index]['cost_total'] += $item->GMP033_Custo_Total;
+            $array[$index]['profit'] += $item->GMP033_Lucro;
+            $array[$index]['margin'] = ($array[$index]['total_sales'] != 0) ? ($array[$index]['profit'] / $array[$index]['total_sales']) * 100 : 0;
+            $array[$index]['ipv'] = ($array[$index]['cost_total'] != 0) ? ($array[$index]['total_sales'] / $array[$index]['cost_total']) : 0;
+            $array[$index]['resume'][] = [
+                'total_sales' => $array[$index]['total_sales'],
+                'cost_total' => $array[$index]['cost_total'],
+                'profit' => $array[$index]['profit'],
+                'margin' => ($array[$index]['total_sales'] != 0) ? ($array[$index]['profit'] / $array[$index]['total_sales']) * 100 : 0,
+                'ipv' => ($array[$index]['cost_total'] != 0) ? ($array[$index]['total_sales'] / $array[$index]['cost_total']) : 0,
+            ];
+        }
+        return $array;
+    }
+
+    /**
+     * @param int|string|null $key
+     * @param mixed $item
+     * @param array $array
+     * @return array
+     */
+    private function makeDataBase(int|string|null $key, mixed $item, array $array): array
+    {
+        $array[] = [
+            'id' => $key,
+            'data_emissao' => $item->GMP033_Data_Emissao,
+            'total_sales' => $item->GMP033_Venda_Total,
+            'cost_total' => $item->GMP033_Custo_Total,
+            'profit' => $item->GMP033_Lucro,
+            'margin' => ($item->GMP033_Venda_Total != 0) ? ($item->GMP033_Lucro / $item->GMP033_Venda_Total) * 100 : 0,
+            'ipv' => ($item->GMP033_Custo_Total != 0) ? ($item->GMP033_Venda_Total / $item->GMP033_Custo_Total) : 0,
+        ];
+        return $array;
+    }
+
+    /**
+     * @param string $start
+     * @param string $end
+     * @return Collection
+     */
+    private function getData(string $start, string $end): Collection
+    {
         return GMP033::query()
             ->select('gmp033.*', 'T005_T005_Id_Agrupado', 'T005_Canal_Vendas_Ecommerce','T005_Nome_Status') // Ou especifique apenas as colunas que precisa
-            ->whereBetween('GMP033_Data_Emissao', [$this->start, $this->end])
+            ->whereBetween('GMP033_Data_Emissao', [$start, $end])
             ->join('T005', function($join) {
                 $join->on('T005.T005_Id', '=', 'gmp033.GMP033_T005_Id')
                     ->where('T005.T005_Nome_Status', '!=', 'Cancelado')
@@ -131,5 +295,6 @@ class DemonstrativeService
             })
             ->get();
     }
+
 
 }

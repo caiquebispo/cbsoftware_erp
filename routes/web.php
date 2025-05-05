@@ -32,6 +32,7 @@ Route::controller(DemonstrativeController::class)->group(function (){
     Route::get('/panel/crm/orders/demonstrative', 'index')->name('demonstrative.index');
     Route::get('/panel/crm/orders/demonstrative/getDataIndicators', 'getDataIndicators');
     Route::get('/panel/crm/orders/demonstrative/getDataChart', 'getDataChart');
+    Route::get('/panel/crm/orders/demonstrative/getDataTable', 'getDataTable');
 });
 
 Route::controller(DemonstrativeBudgetsController::class)->group(function (){
