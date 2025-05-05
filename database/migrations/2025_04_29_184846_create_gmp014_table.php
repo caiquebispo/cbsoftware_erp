@@ -1,6 +1,6 @@
 <?php
 
-use App\Enum\Flag;
+use App\Enums\Flag;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

@@ -4,11 +4,20 @@ namespace App\Services\CRM\Orders;
 
 use App\Models\GMP033;
 use Illuminate\Support\Collection;
+use JetBrains\PhpStorm\ArrayShape;
 
 class DemonstrativeService
 {
     public function __construct()
     {}
+
+    /**
+     * @param string $start
+     * @param string $end
+     * @param string $comparasion
+     * @return array
+     * @throws \DateMalformedStringException
+     */
     public function getDataIndicators(string $start, string $end, string $comparasion = 'year'): array
     {
         $currentStart = new \DateTime($start);
@@ -56,13 +65,22 @@ class DemonstrativeService
             'variation_ipv_is_negative' => $this->calculateVariation($currentIpv, $previousIpv)['is_negative'],
         ];
     }
-    private function calculateVariation($current, $previous,bool $is_ipv = false, $is_variation = false): array
+    #[ArrayShape(['value' => "float", 'is_negative' => "bool"])]
+    private function calculateVariation($current, $previous, bool $is_ipv = false, $is_variation = false): array
     {
         return [
             'value' => $this->getValuePercentage($current, $previous, $is_ipv, $is_variation),
             'is_negative' => $this->getValuePercentage($current, $previous,$is_ipv, $is_variation) < 0 ? false : true,
         ];
     }
+
+    /**
+     * @param float|null $firstValue
+     * @param float|null $secondValue
+     * @param bool $is_ipv
+     * @param $is_variation
+     * @return float
+     */
     private function getValuePercentage(?float $firstValue = 0, ?float $secondValue = 0, bool $is_ipv = false, $is_variation = false): float
     {
         if($is_ipv){
@@ -76,7 +94,15 @@ class DemonstrativeService
         return ($firstValue != 0) ? (($firstValue/$secondValue)-1) * 100 : 0;
     }
 
-    public function getDataChart(string $start, string $end,string $comparasion = 'year'): array
+    /**
+     * @param string $start
+     * @param string $end
+     * @param string $comparasion
+     * @return array
+     * @throws \DateMalformedPeriodStringException
+     * @throws \DateMalformedStringException
+     */
+    public function getDataChart(string $start, string $end, string $comparasion = 'year'): array
     {
 
 
@@ -125,7 +151,6 @@ class DemonstrativeService
             $previousMargin = $previousSales ? ($previousProfit / $previousSales) * 100 : 0;
             $previousIpv = $previousCost ? ($previousSales / $previousCost) * 100 : 0;
 
-
             // Adiciona ao array de resultados
             $results[$currentPeriod] = [
                 $groupKey => $currentPeriod,
@@ -147,6 +172,112 @@ class DemonstrativeService
 
         return array_values($results);
     }
+
+    /**
+     * @param string $start
+     * @param string $end
+     * @param $isGrouped
+     * @return array
+     * @throws \DateMalformedStringException
+     */
+    public function getDataTable(string $start, string $end, $isGrouped = false): array
+    {
+        $isGrouped = $isGrouped == "true" ? true : false;
+
+        $currentStart = new \DateTime($start);
+        $currentEnd = new \DateTime($end);
+
+        $array = [];
+
+        $data = $this->getData($currentStart->format('Y-m-d'), $currentEnd->format('Y-m-d'));
+
+        foreach ($data as $key => $item) {
+
+            if($isGrouped){
+
+                $index = array_search($item->GMP033_Data_Emissao, array_column($array, 'data_emissao'));
+
+                $array = $this->makeDataGrouped($index, $key, $item, $array);
+
+            }else{
+                $array = $this->makeDataBase($key, $item, $array);
+            }
+
+        }
+        return  $array;
+
+    }
+
+    /**
+     * @param false|int|string $index
+     * @param int|string|null $key
+     * @param mixed $item
+     * @param array $array
+     * @return array
+     */
+    private function makeDataGrouped(false|int|string $index, int|string|null $key, mixed $item, array $array): array
+    {
+        if ($index === false) {
+            $array[] = [
+                'id' => $key,
+                'data_emissao' => $item->GMP033_Data_Emissao,
+                'total_sales' => $item->GMP033_Venda_Total,
+                'cost_total' => $item->GMP033_Custo_Total,
+                'profit' => $item->GMP033_Lucro,
+                'margin' => ($item->GMP033_Venda_Total != 0) ? ($item->GMP033_Lucro / $item->GMP033_Venda_Total) * 100 : 0,
+                'ipv' => ($item->GMP033_Custo_Total != 0) ? ($item->GMP033_Venda_Total / $item->GMP033_Custo_Total) : 0,
+                'resume' => [
+                    [
+                        'total_sales' => $item->GMP033_Venda_Total,
+                        'cost_total' => $item->GMP033_Custo_Total,
+                        'profit' => $item->GMP033_Lucro,
+                        'margin' => ($item->GMP033_Venda_Total != 0) ? ($item->GMP033_Lucro / $item->GMP033_Venda_Total) * 100 : 0,
+                        'ipv' => ($item->GMP033_Custo_Total != 0) ? ($item->GMP033_Venda_Total / $item->GMP033_Custo_Total) : 0,
+                    ]
+                ]
+            ];
+        } else {
+            $array[$index]['total_sales'] += $item->GMP033_Venda_Total;
+            $array[$index]['cost_total'] += $item->GMP033_Custo_Total;
+            $array[$index]['profit'] += $item->GMP033_Lucro;
+            $array[$index]['margin'] = ($array[$index]['total_sales'] != 0) ? ($array[$index]['profit'] / $array[$index]['total_sales']) * 100 : 0;
+            $array[$index]['ipv'] = ($array[$index]['cost_total'] != 0) ? ($array[$index]['total_sales'] / $array[$index]['cost_total']) : 0;
+            $array[$index]['resume'][] = [
+                'total_sales' => $array[$index]['total_sales'],
+                'cost_total' => $array[$index]['cost_total'],
+                'profit' => $array[$index]['profit'],
+                'margin' => ($array[$index]['total_sales'] != 0) ? ($array[$index]['profit'] / $array[$index]['total_sales']) * 100 : 0,
+                'ipv' => ($array[$index]['cost_total'] != 0) ? ($array[$index]['total_sales'] / $array[$index]['cost_total']) : 0,
+            ];
+        }
+        return $array;
+    }
+
+    /**
+     * @param int|string|null $key
+     * @param mixed $item
+     * @param array $array
+     * @return array
+     */
+    private function makeDataBase(int|string|null $key, mixed $item, array $array): array
+    {
+        $array[] = [
+            'id' => $key,
+            'data_emissao' => $item->GMP033_Data_Emissao,
+            'total_sales' => $item->GMP033_Venda_Total,
+            'cost_total' => $item->GMP033_Custo_Total,
+            'profit' => $item->GMP033_Lucro,
+            'margin' => ($item->GMP033_Venda_Total != 0) ? ($item->GMP033_Lucro / $item->GMP033_Venda_Total) * 100 : 0,
+            'ipv' => ($item->GMP033_Custo_Total != 0) ? ($item->GMP033_Venda_Total / $item->GMP033_Custo_Total) : 0,
+        ];
+        return $array;
+    }
+
+    /**
+     * @param string $start
+     * @param string $end
+     * @return Collection
+     */
     private function getData(string $start, string $end): Collection
     {
         return GMP033::query()
@@ -164,5 +295,6 @@ class DemonstrativeService
             })
             ->get();
     }
+
 
 }

@@ -36,7 +36,7 @@
         <x-slot:header>
             <x-ui.section-header title="Gráfico" icon="fa-solid fa-chart-bar" />
         </x-slot:header>
-        <div class="flex items-center flex-col md:flex-row gap-5">
+        <div class="flex items-center flex-col md:flex-row gap-5" hidden="">
             <x-ui.select :options="[
                 ['value' => 'total_sales', 'label' => 'Venda'],
                 ['value' => 'cost_total', 'label' => 'Custo'],
@@ -55,13 +55,27 @@
 
             <x-ui.checkbox name="actualPeriod" id="actualPeriod" label="Periodo Atual?" :checked="true" containerClass="flex items-center bg-white"/>
         </div>
+        <div id="charts-container" style="display: flex; flex-wrap: wrap; justify-content: space-around;" class="my-6">
+            <div id="profitChart"></div>
+            <div id="marginChart"></div>
+            <div id="ipvChart"></div>
+        </div>
         <div class="content-chart" style="height: 450px"></div>
     </x-ui.section>
 
-    <x-ui.section class="my-6" collapsed="true">
+    <x-ui.section class="my-6">
         <x-slot:header>
             <x-ui.section-header title="Tabela" icon="fa-solid fa-table" />
         </x-slot:header>
+        <div class="flex items-center flex-col md:flex-row gap-5">
+            <x-ui.select :options="[
+                ['value' => 'true', 'label' => 'Sim'],
+                ['value' => 'false', 'label' => 'Não'],
+            ]" name="is_grouped_data" label="Ver dados Agrupado?" icon="fa-solid fa" class="w-full" id="is_grouped_data" optionValue="value" optionLabel="label" selected="false"/>
+
+        </div>
+        <div id="content-table" class="my-6"></div>
+
     </x-ui.section>
 @endsection
 

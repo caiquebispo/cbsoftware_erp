@@ -37,7 +37,22 @@ class DemonstrativeController extends Controller
            return response()->json(['data' => $dataChart], 200);
 
         } catch (\Exception $e) {
-            
+
+            return response()->json([
+                'Error' => false,
+                'message' => 'Erro interno, favor entrar em contato com nosso suporte',
+            ], 500);
+        }
+    }
+    public function getDataTable(Request $request): JsonResponse
+    {
+        try {
+
+            $dataTable = (new DemonstrativeService())->getDataTable(...$request->all());
+            return response()->json(['data' => $dataTable], 200);
+
+        } catch (\Exception $e) {
+
             return response()->json([
                 'Error' => false,
                 'message' => 'Erro interno, favor entrar em contato com nosso suporte',
